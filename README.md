@@ -1,6 +1,6 @@
 # Lost & Found Application
 
-A simple Node.js + Express + MongoDB application for reporting and viewing lost and found items.
+A Node.js + Express + MongoDB application for reporting and viewing lost and found items. Used Google gemini for intelligent searching.
 
 <img width="866" height="717" alt="Screenshot (1470)" src="https://github.com/user-attachments/assets/c2755456-3f5f-4e6f-ae6f-364a67f48e8d" />
 <img width="800" height="642" alt="Screenshot (1468)" src="https://github.com/user-attachments/assets/82a15c30-aebb-4b22-a26a-42d2f8d5069e" />
