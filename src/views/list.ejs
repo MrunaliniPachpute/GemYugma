@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Items List</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 40px;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .nav-buttons {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .nav-buttons a {
+      display: inline-block;
+      background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+      color: white;
+      padding: 12px 25px;
+      margin: 0 10px;
+      text-decoration: none;
+      border-radius: 25px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .nav-buttons a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+    }
+    .item {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+    .item h3 {
+      color: #333;
+      margin-top: 0;
+      font-size: 1.5em;
+    }
+    .item p {
+      margin: 8px 0;
+      color: #666;
+    }
+    .item img {
+      max-width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+    .status {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .status.open {
+      background: #4CAF50;
+      color: white;
+    }
+    .contact-info {
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .close-btn {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+    .close-btn:hover {
+      background: #ff3742;
+    }
+    .no-items {
+      text-align: center;
+      font-size: 1.2em;
+      color: #666;
+      grid-column: 1 / -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📦 Lost & Found Items</h1>
+    <div class="nav-buttons">
+      <a href="/">🏠 Home</a>
+      <a href="/items/new">➕ Report New Item</a>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 30px;">
+      <input type="text" id="search" placeholder="Search items..." style="padding: 10px; width: 300px; border-radius: 25px; border: 2px solid #ccc; font-size: 16px;">
+    </div>
+
+    <div class="items-grid" id="items-grid">
+      <% if (items.length === 0) { %>
+        <p class="no-items">No open items found. Be the first to report one!</p>
+      <% } else { %>
+        <% items.forEach(item => { %>
+          <div class="item">
+            <h3><%= item.title %></h3>
+            <p><strong>Type:</strong> <%= item.type %></p>
+            <p><strong>Description:</strong> <%= item.description %></p>
+            <p><strong><%= item.lostFoundAt ? (item.type === 'lost' ? 'Lost' : 'Found') + ' on:' : 'Reported on:' %></strong> <%= new Date(item.lostFoundAt || item.createdAt).toLocaleString() %></p>
+            <% if (item.imageUrl) { %>
+              <img src="<%= item.imageUrl %>" alt="Item Image">
+            <% } %><br>
+            <p class="status open"><%= item.status %></p>
+            <div class="contact-info">
+              <strong>Contact:</strong><br>
+              <% if (item.contactType === 'email') { %>
+                📧 <%= item.contactEmail %>
+              <% } else { %>
+                🏢 Handed to Organization
+              <% } %>
+            </div>
+            <form action="/items/<%= item._id %>/close" method="POST" style="display: inline;">
+              <button type="submit" class="close-btn">Close Item</button>
+            </form>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('search');
+    const itemsGrid = document.getElementById('items-grid');
+
+    function renderItems(items) {
+      if (items.length === 0) {
+        itemsGrid.innerHTML = '<p class="no-items">No matching items found.</p>';
+      } else {
+        itemsGrid.innerHTML = items.map(item => `
+          <div class="item">
+            <h3>${item.title}</h3>
+            <p><strong>Type:</strong> ${item.type}</p>
+            <p><strong>Description:</strong> ${item.description}</p>
+            <p><strong>${item.lostFoundAt ? (item.type === 'lost' ? 'Lost' : 'Found') + ' on:' : 'Reported on:'}</strong> ${new Date(item.lostFoundAt || item.createdAt).toLocaleString()}</p>
+            ${item.imageUrl ? `<img src="${item.imageUrl}" alt="Item Image"><br>` : ''}
+            <p class="status open">${item.status}</p>
+            <div class="contact-info">
+              <strong>Contact:</strong><br>
+              ${item.contactType === 'email' ? `📧 ${item.contactEmail}` : '🏢 Handed to Organization'}
+            </div>
+            <form action="/items/${item._id}/close" method="POST" style="display: inline;">
+              <button type="submit" class="close-btn">Close Item</button>
+            </form>
+          </div>
+        `).join('');
+      }
+    }
+
+    async function searchItems(query) {
+      try {
+        const response = await fetch(`/items?search=${encodeURIComponent(query)}`);
+        const html = await response.text();
+        // Since it's EJS, better to return JSON, but for simplicity, parse or reload.
+        // Actually, to make it simple, change the route to return JSON if ajax.
+        // But for now, since it's rendering, perhaps redirect or something.
+        // Wait, better to modify route to return JSON for ajax.
+      } catch (error) {
+        console.error('Search failed:', error);
+      }
+    }
+
+    searchInput.addEventListener('input', async (e) => {
+      const query = e.target.value.trim();
+      if (query) {
+        try {
+          const response = await fetch(`/items?search=${encodeURIComponent(query)}`);
+          const items = await response.json();
+          renderItems(items);
+        } catch (error) {
+          console.error('Search failed:', error);
+          itemsGrid.innerHTML = '<p class="no-items">Search failed. Please try again.</p>';
+        }
+      } else {
+        // Load all
+        location.reload();
+      }
+    });
+  </script>
+</body>
+</html>

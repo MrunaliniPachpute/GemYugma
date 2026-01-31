@@ -1,0 +1,17 @@
+{
+  "name": "lost-found-app",
+  "version": "1.0.0",
+  "description": "Simple Lost & Found application",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "node src/app.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "nedb": "^1.8.0"
+  }
+}
